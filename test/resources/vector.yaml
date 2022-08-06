@@ -1,0 +1,30 @@
+---
+data_dir: ./build/tmp
+acknowledgements:
+  enabled: true
+
+sources:
+  log:
+    type: file
+    include:
+      - ./build/events.log
+    read_from: beginning
+
+transforms:
+  events:
+    type: remap
+    inputs:
+      - log
+    source: |-
+      . = parse_json!(.message)
+
+sinks:
+  http_events:
+    type: http
+    inputs:
+      - events
+    uri: http://localhost:9999/events
+    encoding:
+      codec: json
+    batch:
+      max_events: 1
